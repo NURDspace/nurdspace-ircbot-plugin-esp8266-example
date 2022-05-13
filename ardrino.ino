@@ -1,5 +1,6 @@
 #include <ArduinoJson.h>
 
+#include <LittleFS.h>
 #include <WiFiManager.h>         // https://github.com/tzapu/WiFiManager
 
 #include <PubSubClient.h>
@@ -55,6 +56,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
 				Serial.print(F("Publishing to: "));
 				Serial.println(msgsOutTopic);
 
+				// TODO: do something instead of:
 				client.publish(msgsOutTopic, "Hello, this is Ardrino!");
 			}
 		}
@@ -102,14 +104,14 @@ void reboot() {
 }
 
 void loadConfiguration() {
-	if (SPIFFS.begin()) {
+	if (LittleFS.begin()) {
 		Serial.println(F("mounted file system"));
 
-		if (SPIFFS.exists("/config.json")) {
+		if (LittleFS.exists("/config.json")) {
 			// file exists, reading and loading
 			Serial.println(F("reading config file"));
 
-			File configFile = SPIFFS.open("/config.json", "r");
+			File configFile = LittleFS.open("/config.json", "r");
 			if (configFile) {
 				size_t size = configFile.size();
 
@@ -152,7 +154,7 @@ void saveConfigCallback() {
 	jsonBuffer["mqttServer"]    = mqttServer;
 	jsonBuffer["botMqttPrefix"] = botMqttPrefix;
 
-	File configFile = SPIFFS.open("/config.json", "w");
+	File configFile = LittleFS.open("/config.json", "w");
 	if (!configFile) {
 		Serial.println(F("failed to open config file for writing"));
 
@@ -201,4 +203,6 @@ void setup() {
 
 void loop() {
 	pollMqtt();
+
+	// TODO: do something
 }
